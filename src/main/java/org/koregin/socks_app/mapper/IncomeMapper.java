@@ -2,7 +2,6 @@ package org.koregin.socks_app.mapper;
 
 import org.koregin.socks_app.database.entity.Income;
 import org.koregin.socks_app.dto.IncomeCreateDto;
-import org.koregin.socks_app.service.EmployeeService;
 import org.mapstruct.*;
 
 @Mapper(
