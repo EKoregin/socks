@@ -1,0 +1,22 @@
+server:
+  port: 8881
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/socks
+    username: postgres
+    password: postgres
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: validate
+        show_sql: true
+        format_sql: true
+  liquibase:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
