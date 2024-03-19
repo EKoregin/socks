@@ -1,6 +1,7 @@
 package org.koregin.socks_app.http.handler;
 
 import org.apache.coyote.BadRequestException;
+import org.koregin.socks_app.exceptions.NotCorrectOperationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> handleBadRequest(BadRequestException exception) {
+    public ResponseEntity<?> handleOperationException(NotCorrectOperationException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(exception.getMessage());

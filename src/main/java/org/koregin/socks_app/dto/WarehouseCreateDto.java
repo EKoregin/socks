@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class WarehouseCreateDto {
 
-    private Integer quantity;
+    private Integer total;
     private Long socksId;
 }
