@@ -32,14 +32,14 @@ CREATE TABLE IF NOT EXISTS outcome (
 
 CREATE TABLE IF NOT EXISTS socks_income (
     id BIGSERIAL PRIMARY KEY,
-    count INT default 0,
+    quantity INT default 0,
     socks_id BIGINT REFERENCES socks(id) NOT NULL,
     income_id BIGINT REFERENCES income(id) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS socks_outcome (
      id BIGSERIAL PRIMARY KEY,
-     count INT default 0,
+     quantity INT default 0,
      socks_id BIGINT REFERENCES socks(id) NOT NULL,
      outcome_id BIGINT REFERENCES outcome(id) NOT NULL
 );

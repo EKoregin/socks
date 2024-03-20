@@ -16,7 +16,7 @@ public class SocksOutcome {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer count;
+    private Integer quantity;
 
     @OneToOne
     @JoinColumn(name = "socks_id")

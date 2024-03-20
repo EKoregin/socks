@@ -2,10 +2,7 @@ package org.koregin.socks_app.http.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.koregin.socks_app.dto.IncomeCreateDto;
-import org.koregin.socks_app.dto.SocksCreateDto;
-import org.koregin.socks_app.dto.SocksIncomeCreateDto;
-import org.koregin.socks_app.dto.SocksReadDto;
+import org.koregin.socks_app.dto.*;
 import org.koregin.socks_app.facade.SocksFacade;
 import org.koregin.socks_app.service.SocksService;
 import org.springframework.http.HttpStatus;
@@ -61,4 +58,23 @@ public class SocksController {
     public void acceptIncome(@PathVariable("incomeId") Long incomeId) {
         socksFacade.acceptIncome(incomeId);
     }
+
+    @PostMapping("/outcome")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Long createOutcome(@RequestBody OutcomeRequestDto outcomeRequestDto) {
+        return socksFacade.createOutcome(outcomeRequestDto);
+    }
+
+    @PostMapping("/outcome/add")
+    @ResponseStatus(HttpStatus.OK)
+    public void addSocksToOutcome(@RequestBody SocksOutcomeRequestDto socksOutcomeRequestDto) {
+        socksFacade.addSocksToOutcome(socksOutcomeRequestDto);
+    }
+
+    @PostMapping("/outcome/accept/{outcomeId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void acceptOutcome(@PathVariable("outcomeId") Long outcomeId) {
+        socksFacade.acceptOutcome(outcomeId);
+    }
+
 }

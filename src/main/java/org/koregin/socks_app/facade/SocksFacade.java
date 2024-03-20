@@ -4,17 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.koregin.socks_app.database.entity.Socks;
 import org.koregin.socks_app.database.entity.SocksIncome;
+import org.koregin.socks_app.database.entity.SocksOutcome;
 import org.koregin.socks_app.database.entity.Warehouse;
-import org.koregin.socks_app.database.repository.IncomeRepository;
-import org.koregin.socks_app.database.repository.SocksIncomeRepository;
-import org.koregin.socks_app.database.repository.SocksRepository;
-import org.koregin.socks_app.database.repository.WarehouseRepository;
-import org.koregin.socks_app.dto.IncomeCreateDto;
-import org.koregin.socks_app.dto.SocksIncomeCreateDto;
-import org.koregin.socks_app.dto.WarehouseCreateDto;
+import org.koregin.socks_app.database.repository.*;
+import org.koregin.socks_app.dto.*;
 import org.koregin.socks_app.exceptions.NotCorrectOperationException;
 import org.koregin.socks_app.mapper.SocksIncomeMapper;
+import org.koregin.socks_app.mapper.SocksOutcomeMapper;
 import org.koregin.socks_app.service.IncomeService;
+import org.koregin.socks_app.service.OutcomeService;
 import org.koregin.socks_app.service.WarehouseService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +32,10 @@ public class SocksFacade {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseService warehouseService;
     private final SocksIncomeMapper socksIncomeMapper;
+    private final OutcomeService outcomeService;
+    private final OutcomeRepository outcomeRepository;
+    private final SocksOutcomeRepository socksOutcomeRepository;
+    private final SocksOutcomeMapper socksOutcomeMapper;
 
     public Integer countByParams(String color, Integer cottonPart, String operation) {
         checkOperation(operation);
@@ -92,12 +94,50 @@ public class SocksFacade {
             var socksList = foundIncome.get().getItems();
             for (SocksIncome socksIncome : socksList) {
                 var warehouseCreateDto = new WarehouseCreateDto(socksIncome.getQuantity(), socksIncome.getSocks().getId());
-                warehouseService.updateWarehouse(warehouseCreateDto);
+                warehouseService.addSocksToWarehouse(warehouseCreateDto);
             }
             log.info("Income with ID: {} was accepted in warehouse", incomeId);
             return true;
         } else {
             log.info("Income with ID: {} not found", incomeId);
+            return false;
+        }
+    }
+
+    public Long createOutcome(OutcomeRequestDto outcomeRequestDto) {
+        return outcomeService.create(outcomeRequestDto);
+    }
+
+    public void addSocksToOutcome(SocksOutcomeRequestDto socksOutcomeRequestDto) {
+        var socksId = socksOutcomeRequestDto.getSocksId();
+        var outcome = outcomeRepository.findById(socksOutcomeRequestDto.getOutcomeId()).orElseThrow();
+        var socks = socksRepository.findById(socksOutcomeRequestDto.getSocksId()).orElseThrow();
+        var foundSocksOutcome = socksOutcomeRepository.findByOutcomeAndSocks(outcome, socks);
+
+        if (foundSocksOutcome.isPresent()) {
+            SocksOutcome socksOutcome = socksOutcomeMapper.update(socksOutcomeRequestDto, foundSocksOutcome.get());
+            log.info("Socks outcome for outcome with ID: {} and socksId: {}, was updated, new quantity: {}",
+                    socksOutcomeRequestDto.getOutcomeId(), socksId, socksOutcomeRequestDto.getQuantity());
+            socksOutcomeRepository.saveAndFlush(socksOutcome);
+        } else {
+            log.info("Add new socks with ID: {} to outcome with ID: {}", socksId, socksOutcomeRequestDto.getOutcomeId());
+            SocksOutcome socksOutcome = socksOutcomeMapper.dtoToSocksOutcome(socksOutcomeRequestDto);
+            socksOutcomeRepository.save(socksOutcome);
+        }
+    }
+
+    public boolean acceptOutcome(Long outcomeId) {
+        var foundOutcome = outcomeRepository.findById(outcomeId);
+        if (foundOutcome.isPresent()) {
+            var socksList = foundOutcome.get().getItems();
+            for (SocksOutcome socksOutcome : socksList) {
+                var warehouseCreateDto = new WarehouseCreateDto(socksOutcome.getQuantity(), socksOutcome.getSocks().getId());
+                warehouseService.deleteSocksFromWarehouse(warehouseCreateDto);
+            }
+            log.info("Outcome with ID: {} was accepted in warehouse", outcomeId);
+            return true;
+        } else {
+            log.info("Outcome with ID: {} not found", outcomeId);
             return false;
         }
     }
