@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class WarehouseCreateDto {
+public class WarehouseRequestDto {
 
     private Integer total;
     private Long socksId;

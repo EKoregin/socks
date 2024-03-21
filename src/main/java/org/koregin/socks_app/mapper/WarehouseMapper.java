@@ -2,7 +2,7 @@ package org.koregin.socks_app.mapper;
 
 import org.koregin.socks_app.database.entity.Warehouse;
 import org.koregin.socks_app.database.repository.SocksRepository;
-import org.koregin.socks_app.dto.WarehouseCreateDto;
+import org.koregin.socks_app.dto.WarehouseRequestDto;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,8 +17,8 @@ public abstract class WarehouseMapper {
     protected SocksRepository socksRepository;
 
     @Mapping(target = "socks", expression = "java(socksRepository.findById(dto.getSocksId()).orElse(null))")
-    public abstract Warehouse dtoToWarehouse(WarehouseCreateDto dto);
+    public abstract Warehouse dtoToWarehouse(WarehouseRequestDto dto);
 
     @Mapping(target = "socks", expression = "java(socksRepository.findById(dto.getSocksId()).orElse(null))")
-    public abstract Warehouse update(WarehouseCreateDto dto, @MappingTarget Warehouse warehouse);
+    public abstract Warehouse update(WarehouseRequestDto dto, @MappingTarget Warehouse warehouse);
 }

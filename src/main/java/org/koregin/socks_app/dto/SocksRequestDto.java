@@ -2,13 +2,15 @@ package org.koregin.socks_app.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
-public class SocksCreateDto {
+@AllArgsConstructor
+public class SocksRequestDto {
 
     @NotBlank
     String name;

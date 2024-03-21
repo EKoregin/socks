@@ -3,7 +3,7 @@ package org.koregin.socks_app.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.koregin.socks_app.database.repository.WarehouseRepository;
-import org.koregin.socks_app.dto.WarehouseCreateDto;
+import org.koregin.socks_app.dto.WarehouseRequestDto;
 import org.koregin.socks_app.exceptions.NotEnoughSocksInWarehouseException;
 import org.koregin.socks_app.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
@@ -19,18 +19,18 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
 
     @Override
-    public Integer addSocksToWarehouse(WarehouseCreateDto warehouseCreateDto) {
-        return updateWarehouse(warehouseCreateDto, true);
+    public Integer addSocksToWarehouse(WarehouseRequestDto warehouseRequestDto) {
+        return updateWarehouse(warehouseRequestDto, true);
     }
 
     @Override
-    public Integer deleteSocksFromWarehouse(WarehouseCreateDto warehouseCreateDto) {
-        return updateWarehouse(warehouseCreateDto, false);
+    public Integer deleteSocksFromWarehouse(WarehouseRequestDto warehouseRequestDto) {
+        return updateWarehouse(warehouseRequestDto, false);
     }
 
-    private Integer updateWarehouse(WarehouseCreateDto warehouseCreateDto, boolean addToWarehouse) {
-        log.info("WarehouseCreateDto: total: {}", warehouseCreateDto.getTotal());
-        var newWarehouse = warehouseMapper.dtoToWarehouse(warehouseCreateDto);
+    private Integer updateWarehouse(WarehouseRequestDto warehouseRequestDto, boolean addToWarehouse) {
+        log.info("WarehouseCreateDto: total: {}", warehouseRequestDto.getTotal());
+        var newWarehouse = warehouseMapper.dtoToWarehouse(warehouseRequestDto);
         Integer totalSocksInWarehouse = newWarehouse.getTotal();
         var foundWarehouse = warehouseRepository.findBySocks(newWarehouse.getSocks());
         if (foundWarehouse.isPresent()) {
@@ -40,10 +40,11 @@ public class WarehouseServiceImpl implements WarehouseService {
             } else {
                 totalSocksInWarehouse = foundWarehouse.get().getTotal() - totalSocksInWarehouse;
                 if (totalSocksInWarehouse < 0) {
+                    log.info("Not enough socks in warehouse: " + Math.abs(totalSocksInWarehouse));
                     throw new NotEnoughSocksInWarehouseException("Not enough socks in Warehouse: " + Math.abs(totalSocksInWarehouse));
                 }
             }
-            newWarehouse = warehouseMapper.update(warehouseCreateDto, foundWarehouse.get());
+            newWarehouse = warehouseMapper.update(warehouseRequestDto, foundWarehouse.get());
             newWarehouse.setTotal(totalSocksInWarehouse);
             warehouseRepository.saveAndFlush(newWarehouse);
         } else {

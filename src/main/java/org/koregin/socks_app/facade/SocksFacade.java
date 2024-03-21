@@ -66,24 +66,24 @@ public class SocksFacade {
         }
     }
 
-    public Long createIncome(IncomeCreateDto incomeCreateDto) {
-        return incomeService.create(incomeCreateDto);
+    public Long createIncome(IncomeRequestDto incomeRequestDto) {
+        return incomeService.create(incomeRequestDto);
     }
 
-    public void addSocksToIncome(SocksIncomeCreateDto socksIncomeCreateDto) {
-        var socksId = socksIncomeCreateDto.getSocksId();
-        var income = incomeRepository.findById(socksIncomeCreateDto.getIncomeId()).orElseThrow();
-        var socks = socksRepository.findById(socksIncomeCreateDto.getSocksId()).orElseThrow();
+    public void addSocksToIncome(SocksIncomeRequestDto socksIncomeRequestDto) {
+        var socksId = socksIncomeRequestDto.getSocksId();
+        var income = incomeRepository.findById(socksIncomeRequestDto.getIncomeId()).orElseThrow();
+        var socks = socksRepository.findById(socksIncomeRequestDto.getSocksId()).orElseThrow();
         var foundSocksIncome = socksIncomeRepository.findByIncomeAndSocks(income, socks);
 
         if (foundSocksIncome.isPresent()) {
-            SocksIncome socksIncome = socksIncomeMapper.update(socksIncomeCreateDto, foundSocksIncome.get());
+            SocksIncome socksIncome = socksIncomeMapper.update(socksIncomeRequestDto, foundSocksIncome.get());
             log.info("Socks income for income with ID: {} and socksId: {}, was updated, new quantity: {}",
-                    socksIncomeCreateDto.getIncomeId(), socksId, socksIncomeCreateDto.getQuantity());
+                    socksIncomeRequestDto.getIncomeId(), socksId, socksIncomeRequestDto.getQuantity());
             socksIncomeRepository.saveAndFlush(socksIncome);
         } else {
-            log.info("Add new socks with ID: {} to income with ID: {}", socksId, socksIncomeCreateDto.getIncomeId());
-            SocksIncome socksIncome = socksIncomeMapper.dtoToSocksIncome(socksIncomeCreateDto);
+            log.info("Add new socks with ID: {} to income with ID: {}", socksId, socksIncomeRequestDto.getIncomeId());
+            SocksIncome socksIncome = socksIncomeMapper.dtoToSocksIncome(socksIncomeRequestDto);
             socksIncomeRepository.save(socksIncome);
         }
     }
@@ -93,7 +93,7 @@ public class SocksFacade {
         if (foundIncome.isPresent()) {
             var socksList = foundIncome.get().getItems();
             for (SocksIncome socksIncome : socksList) {
-                var warehouseCreateDto = new WarehouseCreateDto(socksIncome.getQuantity(), socksIncome.getSocks().getId());
+                var warehouseCreateDto = new WarehouseRequestDto(socksIncome.getQuantity(), socksIncome.getSocks().getId());
                 warehouseService.addSocksToWarehouse(warehouseCreateDto);
             }
             log.info("Income with ID: {} was accepted in warehouse", incomeId);
@@ -131,7 +131,7 @@ public class SocksFacade {
         if (foundOutcome.isPresent()) {
             var socksList = foundOutcome.get().getItems();
             for (SocksOutcome socksOutcome : socksList) {
-                var warehouseCreateDto = new WarehouseCreateDto(socksOutcome.getQuantity(), socksOutcome.getSocks().getId());
+                var warehouseCreateDto = new WarehouseRequestDto(socksOutcome.getQuantity(), socksOutcome.getSocks().getId());
                 warehouseService.deleteSocksFromWarehouse(warehouseCreateDto);
             }
             log.info("Outcome with ID: {} was accepted in warehouse", outcomeId);

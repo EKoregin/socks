@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SocksIncomeCreateDto {
+public class SocksIncomeRequestDto {
 
     private Integer quantity;
     private Long socksId;

@@ -30,27 +30,26 @@ public class SocksController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SocksReadDto createSocks(@Validated @RequestBody SocksCreateDto socksCreateDto) {
-        return socksService.create(socksCreateDto);
+    public SocksResponseDto createSocks(@Validated @RequestBody SocksRequestDto socksRequestDto) {
+        return socksService.create(socksRequestDto);
     }
 
     @PutMapping("/{id}")
-    public SocksReadDto updateSocks(@PathVariable("id") Long id,
-                               @Validated @RequestBody SocksCreateDto socksCreateDto) {
-        return socksService.update(id, socksCreateDto)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public SocksResponseDto updateSocks(@PathVariable("id") Long id,
+                                        @Validated @RequestBody SocksRequestDto socksRequestDto) {
+        return socksService.update(id, socksRequestDto);
     }
 
     @PostMapping("/income")
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createIncome(@RequestBody IncomeCreateDto incomeCreateDto) {
-       return socksFacade.createIncome(incomeCreateDto);
+    public Long createIncome(@RequestBody IncomeRequestDto incomeRequestDto) {
+       return socksFacade.createIncome(incomeRequestDto);
     }
 
     @PostMapping("/income/add")
     @ResponseStatus(HttpStatus.OK)
-    public void addSocksToIncome(@RequestBody SocksIncomeCreateDto socksIncomeCreateDto) {
-        socksFacade.addSocksToIncome(socksIncomeCreateDto);
+    public void addSocksToIncome(@RequestBody SocksIncomeRequestDto socksIncomeRequestDto) {
+        socksFacade.addSocksToIncome(socksIncomeRequestDto);
     }
 
     @PostMapping("/income/accept/{incomeId}")

@@ -2,7 +2,7 @@ package org.koregin.socks_app.mapper;
 
 import org.koregin.socks_app.database.entity.Income;
 import org.koregin.socks_app.database.repository.EmployeeRepository;
-import org.koregin.socks_app.dto.IncomeCreateDto;
+import org.koregin.socks_app.dto.IncomeRequestDto;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,5 +21,5 @@ public abstract class IncomeMapper {
 
     @Mapping(target = "employee", expression = "java(employeeRepository.findById(dto.getEmployeeId()).orElse(null))")
     @Mapping(target = "created", expression = "java(LocalDateTime.now())")
-    public abstract Income map(IncomeCreateDto dto);
+    public abstract Income map(IncomeRequestDto dto);
 }
