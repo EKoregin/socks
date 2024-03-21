@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  db_socks:
+    image: postgres
+    container_name: db_socks
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=socks
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ../db/socks/data:/var/lib/postgresql/data
+    restart: always
+  socks:
+#    image: evgkoregin/nms:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+    volumes:
+      - ../logs/socks:/socks/logs
+    container_name: socks
+    depends_on:
+      - db_socks
+    ports:
+      - "8881:8881"

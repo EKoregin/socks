@@ -1,0 +1,7 @@
+logging:
+  file:
+    name: logs/socks.log
+  logback:
+    rollingpolicy:
+      max-file-size: 20MB
+      max-history: 20

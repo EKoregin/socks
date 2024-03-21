@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS socks (
 
 CREATE TABLE IF NOT EXISTS warehouse (
     id BIGSERIAL PRIMARY KEY,
-    quantity INT default 0,
+    total INT default 0,
     socks_id BIGINT REFERENCES socks(id) NOT NULL
 );
 

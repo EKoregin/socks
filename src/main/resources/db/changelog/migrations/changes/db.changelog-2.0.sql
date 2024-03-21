@@ -1,0 +1,1 @@
+INSERT INTO employee (name, role) VALUES ('ivan', 'MANAGER');
