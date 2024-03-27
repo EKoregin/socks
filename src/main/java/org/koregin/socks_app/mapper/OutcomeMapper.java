@@ -1,10 +1,9 @@
 package org.koregin.socks_app.mapper;
 
+import org.koregin.socks_app.database.entity.Employee;
 import org.koregin.socks_app.database.entity.Outcome;
-import org.koregin.socks_app.database.repository.EmployeeRepository;
 import org.koregin.socks_app.dto.OutcomeRequestDto;
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
@@ -14,12 +13,10 @@ import java.time.LocalDateTime;
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         imports = {LocalDateTime.class}
 )
-public abstract class OutcomeMapper {
+public interface OutcomeMapper {
 
-    @Autowired
-    protected EmployeeRepository employeeRepository;
-
-    @Mapping(target = "employee", expression = "java(employeeRepository.findById(dto.getEmployeeId()).orElse(null))")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "employee", source = "employee")
     @Mapping(target = "created", expression = "java(LocalDateTime.now())")
-    public abstract Outcome map(OutcomeRequestDto dto);
+    Outcome map(OutcomeRequestDto dto, Employee employee);
 }

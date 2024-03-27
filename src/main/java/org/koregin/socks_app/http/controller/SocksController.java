@@ -4,12 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.koregin.socks_app.dto.*;
 import org.koregin.socks_app.facade.SocksFacade;
-import org.koregin.socks_app.service.SocksService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 
 @Slf4j
 @RestController
@@ -18,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class SocksController {
 
     private final SocksFacade socksFacade;
-    private final SocksService socksService;
 
     @GetMapping
     public Integer countByParams(@RequestParam String color,
@@ -31,19 +27,19 @@ public class SocksController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SocksResponseDto createSocks(@Validated @RequestBody SocksRequestDto socksRequestDto) {
-        return socksService.create(socksRequestDto);
+        return socksFacade.create(socksRequestDto);
     }
 
     @PutMapping("/{id}")
     public SocksResponseDto updateSocks(@PathVariable("id") Long id,
                                         @Validated @RequestBody SocksRequestDto socksRequestDto) {
-        return socksService.update(id, socksRequestDto);
+        return socksFacade.update(id, socksRequestDto);
     }
 
     @PostMapping("/income")
     @ResponseStatus(HttpStatus.CREATED)
     public Long createIncome(@RequestBody IncomeRequestDto incomeRequestDto) {
-       return socksFacade.createIncome(incomeRequestDto);
+        return socksFacade.createIncome(incomeRequestDto);
     }
 
     @PostMapping("/income/add")

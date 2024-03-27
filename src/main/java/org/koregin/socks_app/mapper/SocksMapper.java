@@ -11,10 +11,10 @@ import org.mapstruct.Mapper;
         componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-public abstract class SocksMapper {
+public interface SocksMapper {
 
-    public abstract Socks dtoToSocks(SocksRequestDto socksRequestDto);
-    public abstract SocksResponseDto socksToDto(Socks socks);
+    Socks dtoToSocks(SocksRequestDto socksRequestDto);
+    SocksResponseDto socksToDto(Socks socks);
 
-    public abstract Socks update(SocksRequestDto dto, @MappingTarget Socks socks);
+    Socks update(SocksRequestDto dto, @MappingTarget Socks socks);
 }

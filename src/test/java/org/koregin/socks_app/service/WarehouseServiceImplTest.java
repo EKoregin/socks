@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.koregin.socks_app.database.entity.Socks;
 import org.koregin.socks_app.database.entity.Warehouse;
+import org.koregin.socks_app.database.repository.SocksRepository;
 import org.koregin.socks_app.database.repository.WarehouseRepository;
 import org.koregin.socks_app.dto.WarehouseRequestDto;
 import org.koregin.socks_app.exceptions.NotEnoughSocksInWarehouseException;
@@ -33,6 +34,9 @@ class WarehouseServiceImplTest {
     @Mock
     private WarehouseRepository warehouseRepository;
 
+    @Mock
+    private SocksRepository socksRepository;
+
     @InjectMocks
     private WarehouseServiceImpl warehouseService;
 
@@ -46,8 +50,9 @@ class WarehouseServiceImplTest {
         Optional<Warehouse> foundWarehouse = Optional.empty();
 
 
-        when(warehouseMapper.dtoToWarehouse(requestDto)).thenReturn(newWarehouse);
-        when(warehouseRepository.findBySocks(socks)).thenReturn(foundWarehouse);
+        when(socksRepository.findById(SOCKS_ID)).thenReturn(Optional.of(socks));
+        when(warehouseMapper.dtoToWarehouse(requestDto, socks)).thenReturn(newWarehouse);
+        when(warehouseRepository.findBySocksId(SOCKS_ID)).thenReturn(foundWarehouse);
         when(warehouseRepository.save(newWarehouse)).thenReturn(savedWarehouse);
 
         var actualResult = warehouseService.addSocksToWarehouse(requestDto);
@@ -60,16 +65,13 @@ class WarehouseServiceImplTest {
     void addSocksToExistedWarehouse() {
         Socks socks = new Socks(SOCKS_ID, "Socks", "BLACK", 90);
         WarehouseRequestDto requestDto = new WarehouseRequestDto(TOTAL_SOCKS, SOCKS_ID);
-        Warehouse newWarehouse = new Warehouse(null, TOTAL_SOCKS, socks);
         Integer newTotalSocks = TOTAL_SOCKS + TOTAL_SOCKS;
         Warehouse savedWarehouse = new Warehouse(WAREHOUSE_ID, newTotalSocks, socks);
-        Optional<Warehouse> foundWarehouse = Optional.of(new Warehouse(WAREHOUSE_ID, TOTAL_SOCKS, socks));
-        Warehouse updatedWarehouse = new Warehouse(WAREHOUSE_ID, TOTAL_SOCKS, socks);
+        Warehouse foundWarehouse = new Warehouse(WAREHOUSE_ID, TOTAL_SOCKS, socks);
 
-        when(warehouseMapper.dtoToWarehouse(requestDto)).thenReturn(newWarehouse);
-        when(warehouseRepository.findBySocks(socks)).thenReturn(foundWarehouse);
-        when(warehouseMapper.update(requestDto, foundWarehouse.get())).thenReturn(updatedWarehouse);
-        when(warehouseRepository.saveAndFlush(updatedWarehouse)).thenReturn(savedWarehouse);
+        when(socksRepository.findById(SOCKS_ID)).thenReturn(Optional.of(socks));
+        when(warehouseRepository.findBySocksId(SOCKS_ID)).thenReturn(Optional.of(foundWarehouse));
+        when(warehouseRepository.saveAndFlush(foundWarehouse)).thenReturn(savedWarehouse);
 
         var actualResult = warehouseService.addSocksToWarehouse(requestDto);
 
@@ -80,16 +82,13 @@ class WarehouseServiceImplTest {
     void deleteSocksFromWarehouse() {
         Socks socks = new Socks(SOCKS_ID, "Socks", "BLACK", 90);
         WarehouseRequestDto requestDto = new WarehouseRequestDto(DEL_SOCKS, SOCKS_ID);
-        Warehouse newWarehouse = new Warehouse(null, DEL_SOCKS, socks);
         Integer newTotalSocks = TOTAL_SOCKS - DEL_SOCKS;
         Warehouse savedWarehouse = new Warehouse(WAREHOUSE_ID, newTotalSocks, socks);
-        Optional<Warehouse> foundWarehouse = Optional.of(new Warehouse(WAREHOUSE_ID, TOTAL_SOCKS, socks));
-        Warehouse updatedWarehouse = new Warehouse(WAREHOUSE_ID, TOTAL_SOCKS, socks);
+        Warehouse foundWarehouse = new Warehouse(WAREHOUSE_ID, TOTAL_SOCKS, socks);
 
-        when(warehouseMapper.dtoToWarehouse(requestDto)).thenReturn(newWarehouse);
-        when(warehouseRepository.findBySocks(socks)).thenReturn(foundWarehouse);
-        when(warehouseMapper.update(requestDto, foundWarehouse.get())).thenReturn(updatedWarehouse);
-        when(warehouseRepository.saveAndFlush(updatedWarehouse)).thenReturn(savedWarehouse);
+        when(socksRepository.findById(SOCKS_ID)).thenReturn(Optional.of(socks));
+        when(warehouseRepository.findBySocksId(SOCKS_ID)).thenReturn(Optional.of(foundWarehouse));
+        when(warehouseRepository.saveAndFlush(foundWarehouse)).thenReturn(savedWarehouse);
 
         var actualResult = warehouseService.deleteSocksFromWarehouse(requestDto);
 
@@ -100,16 +99,15 @@ class WarehouseServiceImplTest {
     void deleteSocksFromWarehouseWhenSocksNotEnough() {
         Socks socks = new Socks(SOCKS_ID, "Socks", "BLACK", 90);
         WarehouseRequestDto requestDto = new WarehouseRequestDto(DEL_SOCKS, SOCKS_ID);
-        Warehouse newWarehouse = new Warehouse(null, DEL_SOCKS, socks);
         int newTotalSocks = DEL_SOCKS - SMALL_TOTAL_SOCKS;
-        Optional<Warehouse> foundWarehouse = Optional.of(new Warehouse(WAREHOUSE_ID, SMALL_TOTAL_SOCKS, socks));
+        Warehouse foundWarehouse = new Warehouse(WAREHOUSE_ID, SMALL_TOTAL_SOCKS, socks);
 
-        when(warehouseMapper.dtoToWarehouse(requestDto)).thenReturn(newWarehouse);
-        when(warehouseRepository.findBySocks(socks)).thenReturn(foundWarehouse);
+        when(socksRepository.findById(SOCKS_ID)).thenReturn(Optional.of(socks));
+        when(warehouseRepository.findBySocksId(SOCKS_ID)).thenReturn(Optional.of(foundWarehouse));
 
         var exception = assertThrows(NotEnoughSocksInWarehouseException.class, () -> warehouseService.deleteSocksFromWarehouse(requestDto));
 
-        assertThat(exception.getMessage()).isEqualTo("Not enough socks in Warehouse: " + newTotalSocks);
+        assertThat(exception.getMessage()).isEqualTo("Not enough " + newTotalSocks + " socks in Warehouse");
     }
 
 }
